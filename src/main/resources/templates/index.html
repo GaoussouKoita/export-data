@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.css}" type="text/css"/>
+    <title>Title</title>
+</head>
+<body>
+
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+
+
+        <ul class="nav navbar-nav">
+            <li>
+                <a th:href="@{/export/pdf}">Exporter en PDF</a>
+            </li>
+            <li>
+                <a th:href="@{/export/csv}">Exporter en CSV</a>
+            </li>
+            <li>
+                <a th:href="@{/export/xlsx}">Exporter en Excel</a>
+            </li>
+
+        </ul>
+    </div>
+</nav>
+
+
+<div class="col-md-10 col-md-offset-1">
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Prenom</th>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Telephone</th>
+            <th>Login</th>
+            <th>Roles</th>
+        </tr>
+        </thead>
+        <tbody>
+
+
+        <tr th:each="user : ${ utilisateurs }">
+            <td th:text="${ user.prenom }"></td>
+            <td th:text="${ user.nom }"></td>
+            <td th:text="${ user.adresse }"></td>
+            <td th:text="${ user.telephone }"></td>
+            <td th:text="${ user.login }"></td>
+            <td>
+                <th:bloc th:each="r : ${user.roles}">
+                    <span th:text="${r.roleName}"></span>
+                </th:bloc>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>
