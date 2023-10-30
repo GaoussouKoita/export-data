@@ -19,7 +19,7 @@ public class UtilisateurService {
 
         roles.add(role1);
         roles.add(role2);
-        for (int i = 1; i < 250; i++) {
+        for (int i = 1; i < 15; i++) {
             Utilisateur utilisateur = new Utilisateur((long) (i), "Utilisateur_" + i, "Prenom_" + i, "Dakar",
                     773332211L, "user_" + i, "1234", roles);
 
