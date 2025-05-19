@@ -1,18 +1,20 @@
 pipeline {
     agent any
+    tools {
+        jdk 'jdk17'          
+        maven 'mvn' 
+    }
     
     stages {
         stage('Build') {
             steps {
-                // Donne les permissions d'exécution au wrapper Maven
-                sh 'chmod +x ./mvnw'
-                sh './mvnw clean install -DskipTests'
+                sh 'mvn clean install -DskipTests'
             }
         }
 
         stage('Test') {
             steps {
-                sh './mvnw test -Punit'
+                sh 'mvn test -Punit'
             }
             post {
                 always {
@@ -28,7 +30,7 @@ pipeline {
                     // Tue le processus Spring Boot s'il est déjà en cours
                     sh 'pkill -f "java.*spring-boot:run.*server.port=8011" || true'
                     // Lance l'application en arrière-plan et enregistre le PID
-                    sh 'nohup ./mvnw spring-boot:run -Dserver.port=8011 > spring-boot.log 2>&1 & echo \$! > spring-boot.pid'
+                    sh 'nohup mvn spring-boot:run -Dserver.port=8011 > spring-boot.log 2>&1 & echo \$! > spring-boot.pid'
                 }
             }
         }
