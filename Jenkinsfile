@@ -1,48 +1,64 @@
 pipeline {
     agent any
-    tools {
         
-        maven 'mvn' 
+    environment {
+        // Variables d'environnement
+        APP_NAME = 'mon-application-springboot'
+        VERSION = '1.0.0'
     }
     
     stages {
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'mvn clean install -DskipTests'
+                // Récupération du code source depuis le dépôt Git
+                git branch: 'main', // Remplacez par votre branche
+                          url: 'https://github.com/GaoussouKoita/export-data.git' // Remplacez par l'URL de votre repo
             }
         }
-
-        stage('Test') {
+        
+        stage('Build & Compile') {
             steps {
-                sh 'mvn test -Punit'
+                // Compilation du projet avec Maven
+                sh 'mvn clean compile'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                // Exécution des tests unitaires
+                sh 'mvn test'
             }
             post {
+                // Archivage des résultats des tests
                 always {
-                    // Archive les résultats de tests (JUnit)
                     junit '**/target/surefire-reports/*.xml'
                 }
             }
         }
-
-        stage('Deployment') {
+        
+        stage('Package Application') {
             steps {
-                script {
-                    // Tue le processus Spring Boot s'il est déjà en cours
-                    sh 'pkill -f "java.*spring-boot:run.*server.port=8011" || true'
-                    // Lance l'application en arrière-plan et enregistre le PID
-                    sh 'nohup mvn spring-boot:run -Dserver.port=8011 > spring-boot.log 2>&1 & echo \$! > spring-boot.pid'
-                }
+                // Création du package JAR
+                sh 'mvn package -DskipTests'
+                
+                // Archivage du JAR généré
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
     }
     
     post {
-        failure {
-            // Notification en cas d'échec
-            echo 'Build failed!'
+        always {
+            // Nettoyage après l'exécution
+            cleanWs()
         }
         success {
-            echo 'Build and deployment successful!'
+            // Notification en cas de succès
+            echo 'Build, test et packaging réussis!'
+        }
+        failure {
+            // Notification en cas d'échec
+            echo 'Échec du pipeline!'
         }
     }
 }
